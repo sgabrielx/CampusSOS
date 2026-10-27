@@ -1,0 +1,6 @@
+CREATE TABLE users(id INTEGER PRIMARY KEY,name TEXT NOT NULL,email TEXT NOT NULL UNIQUE,pass_hash TEXT NOT NULL,role TEXT NOT NULL CHECK(role IN('ADMIN','SECURITY')),active INTEGER NOT NULL DEFAULT 1,created_at TEXT NOT NULL);
+CREATE TABLE cases(id INTEGER PRIMARY KEY,code TEXT NOT NULL UNIQUE,type TEXT NOT NULL CHECK(type IN('SOS','INC')),category TEXT,description TEXT,location TEXT,lat REAL,lng REAL,priority TEXT NOT NULL DEFAULT 'NORMAL',status TEXT NOT NULL,officer_id INTEGER REFERENCES users(id),reporter TEXT,created_at TEXT NOT NULL);
+CREATE TABLE status_history(id INTEGER PRIMARY KEY,case_id INTEGER NOT NULL REFERENCES cases(id),actor_id INTEGER REFERENCES users(id),from_status TEXT,to_status TEXT NOT NULL,reason TEXT,created_at TEXT NOT NULL);
+CREATE TABLE cancellations(id INTEGER PRIMARY KEY,case_id INTEGER NOT NULL REFERENCES cases(id),requester TEXT,reason TEXT,status TEXT NOT NULL DEFAULT 'PENDING' CHECK(status IN('PENDING','APPROVED','REJECTED')),decided_by INTEGER REFERENCES users(id),decision_note TEXT,created_at TEXT NOT NULL);
+CREATE TABLE audit_logs(id INTEGER PRIMARY KEY,actor_id INTEGER REFERENCES users(id),action TEXT NOT NULL,entity TEXT,entity_id INTEGER,detail TEXT,created_at TEXT NOT NULL);
+CREATE INDEX idx_cases_status ON cases(status);CREATE INDEX idx_cases_officer ON cases(officer_id);
